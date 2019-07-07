@@ -75,7 +75,6 @@ _seq_no      | 0f
 _primary_term| 1f
 found        | 1b
 _source      | `time`sym`price!("2019-07-07T12:33:05.180098000";"VOD.L";1000f)
-
 ```
 
 ### `.es.http.get[relativeUrl]`
