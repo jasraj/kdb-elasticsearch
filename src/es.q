@@ -82,13 +82,13 @@
 /  @param relativeUrl (String|SymbolList) The URL to query on the Elasticsearch web API
 /  @returns (Dict) The JSON response parsed into native kdb+ types
 /  @see .es.i.buildUrl
-/  @see .Q.hg
+/  @see .es.i.http10get
 .es.http.get:{[relativeUrl]
     url:.es.i.buildUrl relativeUrl;
 
     .log.debug "Elasticsearch HTTP GET [ URL: ",string[url]," ]";
 
-    :.j.k .Q.hg url;
+    :.j.k .es.i.http10get url;
  };
 
 / HTTP POST interface function to Elasticsearch for an indiviudal document
@@ -190,6 +190,12 @@
     ];
 
     '"InvalidElasticSearchUrlException";
+ };
+
+/ HTTP GET downgraded to HTTP/1.0 (instead of HTTP/1.1) to disable "chunked" responses. The function interface matches .Q.hg
+/  @see .es.i.http10hmb
+.es.i.http10get:{[x]
+    :.es.i.http10hmb[x; `GET; ()];
  };
 
 / HTTP POST downgraded to HTTP/1.0 (instead of HTTP/1.1) to disable "chunked" responses. The function interface matches .Q.hp
