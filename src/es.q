@@ -32,7 +32,7 @@
     ];
 
     if[not esInstance like .es.cfg.requiredUrlPrefix;
-        .log.error "Unsupported Elasticsearch API URL; must be HTTP or HTTPS [ URL: ",string[esInstance]," ]";
+        .log.if.error "Unsupported Elasticsearch API URL; must be HTTP or HTTPS [ URL: ",string[esInstance]," ]";
         '"InvalidElasticSearchInstanceException";
     ];
 
@@ -42,13 +42,13 @@
 
     .es.target:esInstance;
 
-    .log.info "Elasticsearch instance set [ URL: ",string[.es.target]," ]";
+    .log.if.info "Elasticsearch instance set [ URL: ",string[.es.target]," ]";
  };
 
 /  @returns (Table) All the indices available in the current Elasticsearch instance
 /  @see .es.http.get
 .es.getAllIndices:{
-    .log.info "Querying for all available indices from Elasticsearch";
+    .log.if.info "Querying for all available indices from Elasticsearch";
     :.es.http.get "_cat/indices?v&format=json";
  };
 
@@ -86,7 +86,7 @@
 .es.http.get:{[relativeUrl]
     url:.es.i.buildUrl relativeUrl;
 
-    .log.debug "Elasticsearch HTTP GET [ URL: ",string[url]," ]";
+    .log.if.debug "Elasticsearch HTTP GET [ URL: ",string[url]," ]";
 
     :.j.k .es.i.http10get url;
  };
@@ -121,7 +121,7 @@
 
     url:.es.i.buildUrl .es.i.normaliseIndex[index],`doc,id;
 
-    .log.debug "Elasticsearch HTTP POST [ URL: ",string[url]," ]";
+    .log.if.debug "Elasticsearch HTTP POST [ URL: ",string[url]," ]";
 
     :.j.k .Q.hp[url; .es.cfg.postMimeTypes`default; content];
  };
@@ -147,7 +147,7 @@
 
     content:.es.cfg.bulkRowSeparator,(.es.cfg.bulkRowSeparator sv .j.j each contentTable),"\n";
 
-    .log.debug "Elasticsearch HTTP Bulk POST [ URL: ",string[url]," ] [ Size: ",string[count content]," bytes ]";
+    .log.if.debug "Elasticsearch HTTP Bulk POST [ URL: ",string[url]," ] [ Size: ",string[count content]," bytes ]";
 
     :.j.k .es.i.http10post[url; .es.cfg.postMimeTypes`bulk; content];
  };
@@ -158,7 +158,7 @@
 /  @returns (Symbol) The index unmodified if it has a date component, otherwise the original index with today's date appended to it
 .es.i.normaliseIndex:{[index]
     if[not index like "*????.??.??*";
-        .log.info "No date found in index name. Automatically adding today's date [ Index: ",string[index]," ]";
+        .log.if.info "No date found in index name. Automatically adding today's date [ Index: ",string[index]," ]";
         index:`$"-" sv string (index; .time.today[]);
     ];
 
@@ -173,7 +173,7 @@
 /  @throws InvalidElasticSearchUrlException If the URL specified is of an incorrect type
 .es.i.buildUrl:{[relativeUrl]
     if[null .es.target;
-        .log.error "Cannot use Elasticsearch API, no instance specified yet [ Request URL: ",.Q.s1[relativeUrl]," ]";
+        .log.if.error "Cannot use Elasticsearch API, no instance specified yet [ Request URL: ",.Q.s1[relativeUrl]," ]";
         '"NoElasticsearchUrlException";
     ];
 
